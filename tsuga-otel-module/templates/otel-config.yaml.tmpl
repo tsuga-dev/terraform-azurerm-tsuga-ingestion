@@ -1,0 +1,92 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+  azureauth:
+    managed_identity:
+      client_id: $${AZURE_CLIENT_ID}
+
+receivers:
+%{ if enable_metrics ~}
+  azuremonitor:
+    subscription_ids:
+      - "${subscription_id}"
+    auth:
+      authenticator: azureauth
+    use_batch_api: true
+    collection_interval: ${collection_interval}
+%{ if length(resource_targets) > 0 ~}
+    resource_groups:
+%{ for target in resource_targets ~}
+      - "${target}"
+%{ endfor ~}
+%{ endif ~}
+    services:
+      - "Microsoft.Compute/virtualMachines"
+      - "Microsoft.Compute/virtualMachineScaleSets"
+      - "Microsoft.ContainerService/managedClusters"
+      - "Microsoft.Web/sites"
+      - "Microsoft.Web/serverFarms"
+      - "Microsoft.Sql/servers"
+      - "Microsoft.Sql/servers/databases"
+      - "Microsoft.DBforPostgreSQL/flexibleServers"
+      - "Microsoft.DBforMySQL/flexibleServers"
+      - "Microsoft.Cache/Redis"
+      - "Microsoft.Storage/storageAccounts"
+      - "Microsoft.KeyVault/vaults"
+      - "Microsoft.ServiceBus/namespaces"
+      - "Microsoft.EventHub/namespaces"
+      - "Microsoft.Network/loadBalancers"
+      - "Microsoft.Network/applicationGateways"
+      - "Microsoft.Network/publicIPAddresses"
+      - "Microsoft.Cdn/profiles"
+      - "Microsoft.ContainerRegistry/registries"
+      - "Microsoft.App/containerApps"
+      - "Microsoft.CognitiveServices/accounts"
+%{ endif ~}
+
+processors:
+  resourcedetection:
+    detectors:
+      - env
+      - azure
+    timeout: 5s
+    override: false
+
+  batch:
+    timeout: 5s
+
+exporters:
+  otlphttp:
+    endpoint: "${tsuga_intake_url}"
+    compression: gzip
+    timeout: 30s
+    headers:
+      Authorization: "Bearer $${TSUGA_API_KEY}"
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 10s
+      max_elapsed_time: 60s
+    sending_queue:
+      enabled: true
+      num_consumers: 4
+      queue_size: 4096
+
+service:
+  extensions:
+    - health_check
+    - azureauth
+  pipelines:
+%{ if enable_metrics ~}
+    metrics:
+      receivers:
+        - azuremonitor
+      processors:
+        - resourcedetection
+        - batch
+      exporters:
+        - otlphttp
+%{ endif ~}
+  telemetry:
+    logs:
+      level: info

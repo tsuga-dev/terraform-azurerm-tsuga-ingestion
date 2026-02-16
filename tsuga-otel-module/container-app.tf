@@ -1,0 +1,87 @@
+resource "azurerm_container_app_environment" "otel" {
+  name                = "${var.prefix}-otel-env"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  tags                = var.tags
+}
+
+resource "azurerm_container_app" "otel_collector" {
+  name                         = "${var.prefix}-otel-collector"
+  container_app_environment_id = azurerm_container_app_environment.otel.id
+  resource_group_name          = var.resource_group_name
+  revision_mode                = "Single"
+  tags                         = var.tags
+
+  identity {
+    type         = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.otel_collector.id]
+  }
+
+  template {
+    min_replicas    = var.min_replicas
+    max_replicas    = var.max_replicas
+    revision_suffix = substr(sha256(local.otel_config), 0, 8)
+
+    container {
+      name   = "otel-collector"
+      image  = var.otel_collector_image
+      cpu    = var.cpu
+      memory = var.memory
+      # Note: the secret's name becomes the filename in the volume.
+      args = ["--config=/etc/otel/otel-config"]
+
+      env {
+        name        = "TSUGA_API_KEY"
+        secret_name = "tsuga-api-key"
+      }
+
+      # Azure authentication via managed identity
+      env {
+        name  = "AZURE_CLIENT_ID"
+        value = azurerm_user_assigned_identity.otel_collector.client_id
+      }
+
+      volume_mounts {
+        name = "otel-config-volume"
+        path = "/etc/otel"
+      }
+
+      liveness_probe {
+        transport = "HTTP"
+        path      = "/"
+        port      = 13133
+
+        initial_delay           = 30
+        interval_seconds        = 30
+        timeout                 = 5
+        failure_count_threshold = 3
+      }
+
+      startup_probe {
+        transport = "HTTP"
+        path      = "/"
+        port      = 13133
+
+        initial_delay           = 10
+        interval_seconds        = 5
+        timeout                 = 3
+        failure_count_threshold = 30
+      }
+    }
+
+    volume {
+      name         = "otel-config-volume"
+      storage_type = "Secret"
+    }
+  }
+
+  secret {
+    name  = "tsuga-api-key"
+    value = var.tsuga_api_key
+  }
+
+  secret {
+    name  = "otel-config"
+    value = local.otel_config
+  }
+}
