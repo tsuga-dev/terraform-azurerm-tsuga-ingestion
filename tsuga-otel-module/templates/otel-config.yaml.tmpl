@@ -6,6 +6,12 @@ extensions:
       client_id: $${AZURE_CLIENT_ID}
 
 receivers:
+%{ if enable_logs ~}
+  azureeventhub:
+    connection: "${eventhub_connection_string};EntityPath=${eventhub_name}"
+    group: "${eventhub_consumer_group}"
+    format: "azure"
+%{ endif ~}
 %{ if enable_metrics ~}
   azuremonitor:
     subscription_ids:
@@ -81,6 +87,16 @@ service:
     metrics:
       receivers:
         - azuremonitor
+      processors:
+        - resourcedetection
+        - batch
+      exporters:
+        - otlphttp
+%{ endif ~}
+%{ if enable_logs ~}
+    logs:
+      receivers:
+        - azureeventhub
       processors:
         - resourcedetection
         - batch

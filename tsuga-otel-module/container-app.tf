@@ -69,6 +69,25 @@ resource "azurerm_container_app" "otel_collector" {
       }
     }
 
+    # Custom scale rules are required if the app can have more than 1 replica.
+    custom_scale_rule {
+      name             = "cpu"
+      custom_rule_type = "cpu"
+      metadata = {
+        type  = "Utilization"
+        value = "80"
+      }
+    }
+
+    custom_scale_rule {
+      name             = "memory"
+      custom_rule_type = "memory"
+      metadata = {
+        type  = "Utilization"
+        value = "80"
+      }
+    }
+
     volume {
       name         = "otel-config-volume"
       storage_type = "Secret"
