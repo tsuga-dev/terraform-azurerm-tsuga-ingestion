@@ -1,5 +1,5 @@
 variable "subscription_id" {
-  description = "Azure Subscription ID to collect metrics from"
+  description = "Azure Subscription ID to collect telemetry from"
   type        = string
 }
 
@@ -37,7 +37,7 @@ variable "enable_metrics" {
 }
 
 variable "collection_interval" {
-  description = "Metrics collection interval"
+  description = "Metrics collection interval (only used when enable_metrics is true)"
   type        = string
   default     = "60s"
 }
@@ -79,7 +79,37 @@ variable "tags" {
 }
 
 variable "resource_targets" {
-  description = "List of Azure resource groups (names) to collect metrics from. If empty, collects subscription-level metrics."
+  description = "List of Azure resource groups (names) to collect metrics from. If empty, collects subscription-level metrics. Only used when enable_metrics is true."
   type        = list(string)
   default     = []
+}
+
+variable "enable_activity_logs" {
+  description = "Enable Activity Log collection via Event Hub (subscription-wide, not region-restricted)"
+  type        = bool
+  default     = false
+}
+
+variable "enable_resource_logs" {
+  description = "Enable resource diagnostic log collection via Event Hub and Azure Policy (only targets resources in var.location)"
+  type        = bool
+  default     = false
+}
+
+variable "eventhub_capacity" {
+  description = "Throughput units for the Event Hub Namespace (Standard SKU: 1-20)"
+  type        = number
+  default     = 1
+}
+
+variable "eventhub_partition_count" {
+  description = "Number of partitions for the logs Event Hub"
+  type        = number
+  default     = 4
+}
+
+variable "eventhub_message_retention" {
+  description = "Number of days to retain messages in the Event Hub"
+  type        = number
+  default     = 1
 }

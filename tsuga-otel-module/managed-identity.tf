@@ -20,3 +20,9 @@ resource "azurerm_role_assignment" "monitoring_reader_resource_group" {
   role_definition_name = "Monitoring Reader"
   principal_id         = azurerm_user_assigned_identity.otel_collector.principal_id
 }
+resource "azurerm_role_assignment" "eventhub_data_receiver" {
+  count                = local.enable_logs ? 1 : 0
+  scope                = azurerm_eventhub_namespace.logs[0].id
+  role_definition_name = "Azure Event Hubs Data Receiver"
+  principal_id         = azurerm_user_assigned_identity.otel_collector.principal_id
+}

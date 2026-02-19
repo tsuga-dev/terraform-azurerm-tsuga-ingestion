@@ -22,3 +22,18 @@ output "managed_identity_principal_id" {
   description = "Principal ID of the managed identity"
   value       = azurerm_user_assigned_identity.otel_collector.principal_id
 }
+
+output "eventhub_namespace_id" {
+  description = "Resource ID of the Event Hub Namespace (null if logs disabled)"
+  value       = local.enable_logs ? azurerm_eventhub_namespace.logs[0].id : null
+}
+
+output "eventhub_name" {
+  description = "Name of the logs Event Hub (null if logs disabled)"
+  value       = local.enable_logs ? azurerm_eventhub.logs[0].name : null
+}
+
+output "policy_assignment_id" {
+  description = "ID of the diagnostic logs policy assignment (null if resource logs disabled)"
+  value       = var.enable_resource_logs ? azurerm_subscription_policy_assignment.logs_to_eventhub[0].id : null
+}
