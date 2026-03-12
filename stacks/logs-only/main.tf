@@ -5,7 +5,7 @@ provider "azurerm" {
 
 # Create a resource group for the OTel collector
 resource "azurerm_resource_group" "tsuga" {
-  name     = "${var.prefix}-tsuga-integration"
+  name     = "${var.prefix}-tsuga-ingestion"
   location = var.location
   tags     = var.tags
 }
