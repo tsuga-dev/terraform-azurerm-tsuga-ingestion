@@ -11,7 +11,7 @@ resource "azurerm_resource_group" "tsuga" {
 }
 
 module "tsuga_otel" {
-  source = "../../tsuga-otel-module"
+  source = "../.."
 
   subscription_id     = var.subscription_id
   resource_group_name = azurerm_resource_group.tsuga.name
@@ -21,9 +21,7 @@ module "tsuga_otel" {
   tsuga_api_key    = var.tsuga_api_key
   tsuga_intake_url = var.tsuga_intake_url
 
-  enable_metrics       = true
-  enable_activity_logs = true
-  enable_resource_logs = true
+  enable_metrics = true
 
   collection_interval = var.collection_interval
   min_replicas        = var.min_replicas

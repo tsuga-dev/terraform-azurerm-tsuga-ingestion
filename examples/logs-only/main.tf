@@ -11,7 +11,7 @@ resource "azurerm_resource_group" "tsuga" {
 }
 
 module "tsuga_otel" {
-  source = "../../tsuga-otel-module"
+  source = "../.."
 
   subscription_id     = var.subscription_id
   resource_group_name = azurerm_resource_group.tsuga.name

@@ -1,5 +1,13 @@
 # Telemetry Collection Integration - Azure to Tsuga
 
+This module creates an OTel collector running on Container App to collect your:
+
+- Activity Logs
+- and/or Resource Logs
+- and/or Metrics
+
+It also creates an Event Hub if you set it to collect logs.
+
 ## Prerequisites
 
 - Download `az` CLI.
@@ -10,69 +18,62 @@
 
 ## Usage
 
-The `tsuga-otel-module` folder contains our OTel Tsuga terraform module for metrics and logs ingestion from Azure.
+Use the module from your own Terraform code and pin it to a published module version:
+
+```hcl
+resource "azurerm_resource_group" "tsuga" {
+  name     = "${var.prefix}-tsuga-ingestion"
+  location = var.location
+}
+
+module "tsuga_ingestion" {
+  source  = "tsuga-dev/tsuga-ingestion/azurerm"
+  version = "<version>"
+
+  subscription_id     = var.subscription_id
+  resource_group_name = azurerm_resource_group.tsuga.name
+  location            = var.location
+  tsuga_api_key       = var.tsuga_api_key
+  tsuga_intake_url    = var.tsuga_intake_url
+
+  enable_metrics       = true
+  enable_activity_logs = true
+  enable_resource_logs = true
+}
+```
+
+If you already have a resource group, pass its name directly to `resource_group_name` instead of creating `azurerm_resource_group.tsuga`.
 
 ### Configuration Variables
 
-| Variable                     | Description                                   | Type         | Default                                        | Required |
-| ---------------------------- | --------------------------------------------- | ------------ | ---------------------------------------------- | -------- |
-| `subscription_id`            | Azure Subscription ID to collect telemetry from | string       | -                                              | yes      |
-| `resource_group_name`        | Name of the resource group to deploy into     | string       | -                                              | yes      |
-| `location`                   | Azure region for deployed resources           | string       | -                                              | yes      |
-| `tsuga_api_key`              | Tsuga API Key for integration                 | string       | -                                              | yes      |
-| `tsuga_intake_url`           | Tsuga OTLP/HTTP ingestion endpoint            | string       | -                                              | yes      |
-| `prefix`                     | Base name for resources                       | string       | "tsuga"                                        | no       |
-| `enable_metrics`             | Enable metrics collection from Azure to Tsuga | bool         | true                                           | no       |
-| `collection_interval`        | How often to pull metrics (metrics only)      | string       | "60s"                                          | no       |
-| `min_replicas`               | Minimum number of container replicas          | number       | 1                                              | no       |
-| `max_replicas`               | Maximum number of container replicas          | number       | 3                                              | no       |
-| `cpu`                        | CPU allocation for container (in cores)       | number       | 0.5                                            | no       |
-| `memory`                     | Memory allocation for container               | string       | "1Gi"                                          | no       |
-| `otel_collector_image`       | OTel Collector container image                | string       | "otel/opentelemetry-collector-contrib:0.145.0" | no       |
-| `resource_targets`           | Resource groups to filter metrics (metrics only) | list(string) | []                                             | no       |
-| `tags`                       | Tags to apply to resources                    | map(string)  | {}                                             | no       |
-| `enable_activity_logs`       | Enable Activity Log collection (subscription-wide) | bool         | false                                          | no       |
+| Variable                     | Description                                                  | Type         | Default                                        | Required |
+| ---------------------------- | ------------------------------------------------------------ | ------------ | ---------------------------------------------- | -------- |
+| `subscription_id`            | Azure Subscription ID to collect telemetry from              | string       | -                                              | yes      |
+| `resource_group_name`        | Name of the resource group to deploy into                    | string       | -                                              | yes      |
+| `location`                   | Azure region for deployed resources                          | string       | -                                              | yes      |
+| `tsuga_api_key`              | Tsuga API Key for integration                                | string       | -                                              | yes      |
+| `tsuga_intake_url`           | Tsuga OTLP/HTTP ingestion endpoint                           | string       | -                                              | yes      |
+| `prefix`                     | Base name for resources                                      | string       | "tsuga"                                        | no       |
+| `enable_metrics`             | Enable metrics collection from Azure to Tsuga                | bool         | true                                           | no       |
+| `collection_interval`        | How often to pull metrics (metrics only)                     | string       | "60s"                                          | no       |
+| `min_replicas`               | Minimum number of container replicas                         | number       | 1                                              | no       |
+| `max_replicas`               | Maximum number of container replicas                         | number       | 3                                              | no       |
+| `cpu`                        | CPU allocation for container (in cores)                      | number       | 0.5                                            | no       |
+| `memory`                     | Memory allocation for container                              | string       | "1Gi"                                          | no       |
+| `otel_collector_image`       | OTel Collector container image                               | string       | "otel/opentelemetry-collector-contrib:0.145.0" | no       |
+| `resource_targets`           | Resource groups to filter metrics (metrics only)             | list(string) | []                                             | no       |
+| `tags`                       | Tags to apply to resources                                   | map(string)  | {}                                             | no       |
+| `enable_activity_logs`       | Enable Activity Log collection (subscription-wide)           | bool         | false                                          | no       |
 | `enable_resource_logs`       | Enable resource diagnostic log collection (same region only) | bool         | false                                          | no       |
-| `eventhub_capacity`          | Throughput units for the Event Hub Namespace   | number       | 1                                              | no       |
+| `eventhub_capacity`          | Throughput units for the Event Hub Namespace                 | number       | 1                                              | no       |
 | `eventhub_partition_count`   | Number of partitions for the logs Event Hub (see note below) | number       | 4                                              | no       |
-| `eventhub_message_retention` | Days to retain messages in the Event Hub      | number       | 1                                              | no       |
+| `eventhub_message_retention` | Days to retain messages in the Event Hub                     | number       | 1                                              | no       |
 
 > **Note on `eventhub_partition_count`:** Set this to at least the value of `max_replicas`, since each collector replica consumes from one partition. The partition count **cannot be changed after creation** (Standard SKU) — the Event Hub must be destroyed and recreated. The default of 4 accommodates the default `max_replicas` of 3.
 
 ## Examples
 
-### Metrics Only
-
-```bash
-cd stacks/metrics-only
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your values
-terraform init
-terraform plan
-terraform apply
-```
-
-### Logs Only
-
-```bash
-cd stacks/logs-only
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your values
-terraform init
-terraform plan
-terraform apply
-```
-
-### Metrics and Logs
-
-```bash
-cd stacks/metrics-and-logs
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your values
-terraform init
-terraform plan
-terraform apply
-```
+See the `examples/` folder.
 
 ## Architecture
 
