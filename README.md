@@ -140,7 +140,4 @@ When the OTel configuration changes, a new container app revision is automatical
 
 ## Security
 
-Note that for convenience, the Tsuga API key is passed in Terraform state. You can mitigate this by:
-
-- Encrypting Terraform's state
-- Using Azure Key Vault with a separate secret management process
+Note that for convenience, the Tsuga API key is passed in Terraform state. You can mitigate this by encrypting the Terraform state.
