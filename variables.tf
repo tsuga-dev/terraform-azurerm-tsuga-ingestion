@@ -69,7 +69,7 @@ variable "memory" {
 variable "otel_collector_image" {
   description = "OTel Collector container image"
   type        = string
-  default     = "otel/opentelemetry-collector-contrib:0.145.0"
+  default     = "otel/opentelemetry-collector-contrib:0.149.0"
 }
 
 variable "tags" {
