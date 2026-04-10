@@ -8,9 +8,9 @@ locals {
     resource_targets           = var.resource_targets
     enable_metrics             = var.enable_metrics
     enable_logs                = local.enable_logs
-    eventhub_connection_string = local.enable_logs ? azurerm_eventhub_namespace_authorization_rule.otel_listen[0].primary_connection_string : ""
-    eventhub_name              = local.enable_logs ? azurerm_eventhub.logs[0].name : ""
-    eventhub_consumer_group    = local.enable_logs ? azurerm_eventhub_consumer_group.otel_collector[0].name : ""
+    eventhub_connection_string = try(azurerm_eventhub_namespace_authorization_rule.otel_listen[0].primary_connection_string, "")
+    eventhub_name              = try(azurerm_eventhub.logs[0].name, "")
+    eventhub_consumer_group    = try(azurerm_eventhub_consumer_group.otel_collector[0].name, "")
   })
 }
 
