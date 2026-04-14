@@ -42,14 +42,14 @@ variable "collection_interval" {
   default     = "60s"
 }
 
-variable "min_replicas" {
-  description = "Minimum number of container replicas"
+variable "logs_min_replicas" {
+  description = "Minimum number of replicas for the logs container app"
   type        = number
   default     = 1
 }
 
-variable "max_replicas" {
-  description = "Maximum number of container replicas"
+variable "logs_max_replicas" {
+  description = "Maximum number of replicas for the logs container app"
   type        = number
   default     = 3
 }

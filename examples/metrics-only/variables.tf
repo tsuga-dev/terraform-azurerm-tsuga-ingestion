@@ -32,18 +32,6 @@ variable "collection_interval" {
   default     = "60s"
 }
 
-variable "min_replicas" {
-  description = "Minimum container replicas"
-  type        = number
-  default     = 1
-}
-
-variable "max_replicas" {
-  description = "Maximum container replicas"
-  type        = number
-  default     = 3
-}
-
 variable "tags" {
   description = "Tags for resources"
   type        = map(string)

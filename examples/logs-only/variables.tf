@@ -26,14 +26,14 @@ variable "tsuga_intake_url" {
   type        = string
 }
 
-variable "min_replicas" {
-  description = "Minimum container replicas"
+variable "logs_min_replicas" {
+  description = "Minimum replicas for the logs container app"
   type        = number
   default     = 1
 }
 
-variable "max_replicas" {
-  description = "Maximum container replicas"
+variable "logs_max_replicas" {
+  description = "Maximum replicas for the logs container app"
   type        = number
   default     = 3
 }

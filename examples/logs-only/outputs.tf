@@ -1,6 +1,6 @@
-output "container_app_fqdn" {
-  description = "Container App FQDN"
-  value       = module.tsuga_otel.container_app_fqdn
+output "logs_container_app_fqdn" {
+  description = "Logs Container App FQDN"
+  value       = module.tsuga_otel.logs_container_app_fqdn
 }
 
 output "managed_identity_client_id" {

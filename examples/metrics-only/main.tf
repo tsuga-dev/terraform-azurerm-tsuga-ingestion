@@ -24,8 +24,6 @@ module "tsuga_otel" {
   enable_metrics = true
 
   collection_interval = var.collection_interval
-  min_replicas        = var.min_replicas
-  max_replicas        = var.max_replicas
 
   tags = var.tags
 }

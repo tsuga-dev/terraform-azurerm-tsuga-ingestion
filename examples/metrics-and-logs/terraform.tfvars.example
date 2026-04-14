@@ -4,8 +4,8 @@ prefix              = "tsuga"
 tsuga_api_key       = "your-tsuga-api-key"
 tsuga_intake_url    = "https://intake.tsuga.io/v1/otlp"
 collection_interval = "60s"
-min_replicas        = 1
-max_replicas        = 3
+logs_min_replicas   = 1
+logs_max_replicas   = 3
 
 tags = {
   Environment = "production"
