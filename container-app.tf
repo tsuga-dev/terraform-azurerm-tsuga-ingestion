@@ -1,3 +1,7 @@
+locals {
+  otel_collector_image = "otel/opentelemetry-collector-contrib:0.150.0"
+}
+
 resource "azurerm_container_app_environment" "otel" {
   name                = "${var.prefix}-otel-env"
   resource_group_name = var.resource_group_name
@@ -30,7 +34,7 @@ resource "azurerm_container_app" "otel_logs" {
 
     container {
       name   = "otel-collector"
-      image  = var.otel_collector_image
+      image  = local.otel_collector_image
       cpu    = var.cpu
       memory = var.memory
       # Note: the secret's name becomes the filename in the volume.
@@ -105,6 +109,7 @@ resource "azurerm_container_app" "otel_logs" {
     value = var.tsuga_api_key
   }
 
+
   secret {
     name  = "otel-config"
     value = coalesce(local.otel_config_logs, "")
@@ -132,7 +137,7 @@ resource "azurerm_container_app" "otel_metrics" {
 
     container {
       name   = "otel-collector"
-      image  = var.otel_collector_image
+      image  = local.otel_collector_image
       cpu    = var.cpu
       memory = var.memory
       # Note: the secret's name becomes the filename in the volume.

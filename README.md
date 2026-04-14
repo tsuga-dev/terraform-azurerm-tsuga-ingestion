@@ -60,7 +60,6 @@ If you already have a resource group, pass its name directly to `resource_group_
 | `max_replicas`               | Maximum number of container replicas                         | number       | 3                                              | no       |
 | `cpu`                        | CPU allocation for container (in cores)                      | number       | 0.5                                            | no       |
 | `memory`                     | Memory allocation for container                              | string       | "1Gi"                                          | no       |
-| `otel_collector_image`       | OTel Collector container image                               | string       | "otel/opentelemetry-collector-contrib:0.149.0" | no       |
 | `resource_targets`           | Resource groups to filter metrics (metrics only)             | list(string) | []                                             | no       |
 | `tags`                       | Tags to apply to resources                                   | map(string)  | {}                                             | no       |
 | `enable_activity_logs`       | Enable Activity Log collection (subscription-wide)           | bool         | false                                          | no       |
