@@ -26,8 +26,8 @@ module "tsuga_otel" {
   enable_resource_logs = true
 
   collection_interval = var.collection_interval
-  min_replicas        = var.min_replicas
-  max_replicas        = var.max_replicas
+  logs_min_replicas   = var.logs_min_replicas
+  logs_max_replicas   = var.logs_max_replicas
 
   tags = var.tags
 }
