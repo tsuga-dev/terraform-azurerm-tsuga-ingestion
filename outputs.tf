@@ -1,21 +1,21 @@
 output "logs_container_app_fqdn" {
   description = "Fully qualified domain name of the logs Container App (null if logs disabled)"
-  value       = local.enable_logs ? azurerm_container_app.otel_logs[0].latest_revision_fqdn : null
+  value       = local.enable_logs ? try(azurerm_container_app.otel_logs[0].latest_revision_fqdn, null) : null
 }
 
 output "logs_container_app_id" {
   description = "Resource ID of the logs Container App (null if logs disabled)"
-  value       = local.enable_logs ? azurerm_container_app.otel_logs[0].id : null
+  value       = local.enable_logs ? try(azurerm_container_app.otel_logs[0].id, null) : null
 }
 
 output "metrics_container_app_fqdn" {
   description = "Fully qualified domain name of the metrics Container App (null if metrics disabled)"
-  value       = var.enable_metrics ? azurerm_container_app.otel_metrics[0].latest_revision_fqdn : null
+  value       = var.enable_metrics ? try(azurerm_container_app.otel_metrics[0].latest_revision_fqdn, null) : null
 }
 
 output "metrics_container_app_id" {
   description = "Resource ID of the metrics Container App (null if metrics disabled)"
-  value       = var.enable_metrics ? azurerm_container_app.otel_metrics[0].id : null
+  value       = var.enable_metrics ? try(azurerm_container_app.otel_metrics[0].id, null) : null
 }
 
 output "managed_identity_id" {
