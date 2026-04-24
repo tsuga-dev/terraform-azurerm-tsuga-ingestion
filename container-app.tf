@@ -1,5 +1,5 @@
 locals {
-  otel_collector_image = "otel/opentelemetry-collector-contrib:0.150.0"
+  otel_collector_image = "otel/opentelemetry-collector-contrib:0.150.1"
 }
 
 resource "azurerm_container_app_environment" "otel" {
