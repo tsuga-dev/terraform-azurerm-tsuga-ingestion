@@ -42,7 +42,7 @@ processors:
     timeout: 5s
 
 exporters:
-  otlphttp:
+  otlp_http:
     endpoint: "${tsuga_intake_url}"
     compression: gzip
     timeout: 30s
@@ -71,7 +71,7 @@ service:
         - resourcedetection
         - batch
       exporters:
-        - otlphttp
+        - otlp_http
 %{ endif ~}
 %{ if enable_logs ~}
     logs:
@@ -81,7 +81,7 @@ service:
         - resourcedetection
         - batch
       exporters:
-        - otlphttp
+        - otlp_http
 %{ endif ~}
   telemetry:
     logs:
