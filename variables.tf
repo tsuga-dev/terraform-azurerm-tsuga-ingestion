@@ -98,7 +98,7 @@ variable "eventhub_capacity" {
 }
 
 variable "eventhub_partition_count" {
-  description = "Number of partitions for the logs Event Hub"
+  description = "Number of partitions for the logs Event Hub. Set this to at least `logs_max_replicas`, since each collector replica consumes from one partition. The partition count cannot be changed after creation (Standard SKU) — the Event Hub must be destroyed and recreated. The default of 4 accommodates the default `logs_max_replicas` of 3."
   type        = number
   default     = 4
 }
