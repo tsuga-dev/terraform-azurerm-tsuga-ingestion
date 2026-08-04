@@ -44,31 +44,59 @@ module "tsuga_ingestion" {
 
 If you already have a resource group, pass its name directly to `resource_group_name` instead of creating `azurerm_resource_group.tsuga`.
 
-### Configuration Variables
+<!-- BEGIN_TF_DOCS -->
+## Requirements
 
-| Variable                     | Description                                                  | Type         | Default                                        | Required |
-| ---------------------------- | ------------------------------------------------------------ | ------------ | ---------------------------------------------- | -------- |
-| `subscription_id`            | Azure Subscription ID to collect telemetry from              | string       | -                                              | yes      |
-| `resource_group_name`        | Name of the resource group to deploy into                    | string       | -                                              | yes      |
-| `location`                   | Azure region for deployed resources                          | string       | -                                              | yes      |
-| `tsuga_api_key`              | Tsuga API Key for integration                                | string       | -                                              | yes      |
-| `tsuga_intake_url`           | Tsuga OTLP/HTTP ingestion endpoint                           | string       | -                                              | yes      |
-| `prefix`                     | Base name for resources                                      | string       | "tsuga"                                        | no       |
-| `enable_metrics`             | Enable metrics collection from Azure to Tsuga                | bool         | true                                           | no       |
-| `collection_interval`        | How often to pull metrics (metrics only)                     | string       | "60s"                                          | no       |
-| `min_replicas`               | Minimum number of container replicas                         | number       | 1                                              | no       |
-| `max_replicas`               | Maximum number of container replicas                         | number       | 3                                              | no       |
-| `cpu`                        | CPU allocation for container (in cores)                      | number       | 0.5                                            | no       |
-| `memory`                     | Memory allocation for container                              | string       | "1Gi"                                          | no       |
-| `resource_targets`           | Resource groups to filter metrics (metrics only)             | list(string) | []                                             | no       |
-| `tags`                       | Tags to apply to resources                                   | map(string)  | {}                                             | no       |
-| `enable_activity_logs`       | Enable Activity Log collection (subscription-wide)           | bool         | false                                          | no       |
-| `enable_resource_logs`       | Enable resource diagnostic log collection (same region only) | bool         | false                                          | no       |
-| `eventhub_capacity`          | Throughput units for the Event Hub Namespace                 | number       | 1                                              | no       |
-| `eventhub_partition_count`   | Number of partitions for the logs Event Hub (see note below) | number       | 4                                              | no       |
-| `eventhub_message_retention` | Days to retain messages in the Event Hub                     | number       | 1                                              | no       |
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.6 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.0 |
 
-> **Note on `eventhub_partition_count`:** Set this to at least the value of `max_replicas`, since each collector replica consumes from one partition. The partition count **cannot be changed after creation** (Standard SKU) — the Event Hub must be destroyed and recreated. The default of 4 accommodates the default `max_replicas` of 3.
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.0 |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_collection_interval"></a> [collection\_interval](#input\_collection\_interval) | Metrics collection interval (only used when enable\_metrics is true) | `string` | `"60s"` | no |
+| <a name="input_cpu"></a> [cpu](#input\_cpu) | CPU allocation for container (in cores) | `number` | `0.5` | no |
+| <a name="input_enable_activity_logs"></a> [enable\_activity\_logs](#input\_enable\_activity\_logs) | Enable Activity Log collection via Event Hub (subscription-wide, not region-restricted) | `bool` | `false` | no |
+| <a name="input_enable_metrics"></a> [enable\_metrics](#input\_enable\_metrics) | Enable metrics collection via Azure Monitor | `bool` | `true` | no |
+| <a name="input_enable_resource_logs"></a> [enable\_resource\_logs](#input\_enable\_resource\_logs) | Enable resource diagnostic log collection via Event Hub and Azure Policy (only targets resources in var.location) | `bool` | `false` | no |
+| <a name="input_eventhub_capacity"></a> [eventhub\_capacity](#input\_eventhub\_capacity) | Throughput units for the Event Hub Namespace (Standard SKU: 1-20) | `number` | `1` | no |
+| <a name="input_eventhub_message_retention"></a> [eventhub\_message\_retention](#input\_eventhub\_message\_retention) | Number of days to retain messages in the Event Hub | `number` | `1` | no |
+| <a name="input_eventhub_partition_count"></a> [eventhub\_partition\_count](#input\_eventhub\_partition\_count) | Number of partitions for the logs Event Hub. Set this to at least `logs_max_replicas`, since each collector replica consumes from one partition. The partition count cannot be changed after creation (Standard SKU) — the Event Hub must be destroyed and recreated. The default of 4 accommodates the default `logs_max_replicas` of 3. | `number` | `4` | no |
+| <a name="input_location"></a> [location](#input\_location) | Azure region for deployed resources | `string` | n/a | yes |
+| <a name="input_logs_max_replicas"></a> [logs\_max\_replicas](#input\_logs\_max\_replicas) | Maximum number of replicas for the logs container app | `number` | `3` | no |
+| <a name="input_logs_min_replicas"></a> [logs\_min\_replicas](#input\_logs\_min\_replicas) | Minimum number of replicas for the logs container app | `number` | `1` | no |
+| <a name="input_memory"></a> [memory](#input\_memory) | Memory allocation for container (e.g., '1Gi') | `string` | `"1Gi"` | no |
+| <a name="input_prefix"></a> [prefix](#input\_prefix) | Prefix for resource names | `string` | `"tsuga"` | no |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group to deploy into | `string` | n/a | yes |
+| <a name="input_resource_targets"></a> [resource\_targets](#input\_resource\_targets) | List of Azure resource groups (names) to collect metrics from. If empty, collects subscription-level metrics. Only used when enable\_metrics is true. | `list(string)` | `[]` | no |
+| <a name="input_subscription_id"></a> [subscription\_id](#input\_subscription\_id) | Azure Subscription ID to collect telemetry from | `string` | n/a | yes |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to resources | `map(string)` | `{}` | no |
+| <a name="input_tsuga_api_key"></a> [tsuga\_api\_key](#input\_tsuga\_api\_key) | Tsuga API key for authentication | `string` | n/a | yes |
+| <a name="input_tsuga_intake_url"></a> [tsuga\_intake\_url](#input\_tsuga\_intake\_url) | Tsuga OTLP/HTTP endpoint URL | `string` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_eventhub_name"></a> [eventhub\_name](#output\_eventhub\_name) | Name of the logs Event Hub (null if logs disabled) |
+| <a name="output_eventhub_namespace_id"></a> [eventhub\_namespace\_id](#output\_eventhub\_namespace\_id) | Resource ID of the Event Hub Namespace (null if logs disabled) |
+| <a name="output_logs_container_app_fqdn"></a> [logs\_container\_app\_fqdn](#output\_logs\_container\_app\_fqdn) | Fully qualified domain name of the logs Container App (null if logs disabled) |
+| <a name="output_logs_container_app_id"></a> [logs\_container\_app\_id](#output\_logs\_container\_app\_id) | Resource ID of the logs Container App (null if logs disabled) |
+| <a name="output_managed_identity_client_id"></a> [managed\_identity\_client\_id](#output\_managed\_identity\_client\_id) | Client ID of the managed identity |
+| <a name="output_managed_identity_id"></a> [managed\_identity\_id](#output\_managed\_identity\_id) | Resource ID of the managed identity |
+| <a name="output_managed_identity_principal_id"></a> [managed\_identity\_principal\_id](#output\_managed\_identity\_principal\_id) | Principal ID of the managed identity |
+| <a name="output_metrics_container_app_fqdn"></a> [metrics\_container\_app\_fqdn](#output\_metrics\_container\_app\_fqdn) | Fully qualified domain name of the metrics Container App (null if metrics disabled) |
+| <a name="output_metrics_container_app_id"></a> [metrics\_container\_app\_id](#output\_metrics\_container\_app\_id) | Resource ID of the metrics Container App (null if metrics disabled) |
+| <a name="output_policy_assignment_id"></a> [policy\_assignment\_id](#output\_policy\_assignment\_id) | ID of the diagnostic logs policy assignment (null if resource logs disabled) |
+<!-- END_TF_DOCS -->
 
 ## Examples
 
