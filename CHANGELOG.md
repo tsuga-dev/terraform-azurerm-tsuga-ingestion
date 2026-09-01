@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update the AzureRM provider constraint to `~> 4.0`.
+
 ## [1.0.4] - 2026-04-24
 
 Releases up to and including v1.0.4 predate this changelog. See the
