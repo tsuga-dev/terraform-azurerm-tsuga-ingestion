@@ -31,7 +31,7 @@ receivers:
 %{ endif ~}
 
 processors:
-  resourcedetection:
+  resource_detection:
     detectors:
       - env
       - azure
@@ -68,7 +68,7 @@ service:
       receivers:
         - azuremonitor
       processors:
-        - resourcedetection
+        - resource_detection
         - batch
       exporters:
         - otlp_http
@@ -78,7 +78,7 @@ service:
       receivers:
         - azureeventhub
       processors:
-        - resourcedetection
+        - resource_detection
         - batch
       exporters:
         - otlp_http
