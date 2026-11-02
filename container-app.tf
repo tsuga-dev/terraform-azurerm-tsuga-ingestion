@@ -1,4 +1,5 @@
 locals {
+  # renovate: datasource=docker depName=otel/opentelemetry-collector-contrib
   otel_collector_image = "otel/opentelemetry-collector-contrib:0.164.0"
 }
 
