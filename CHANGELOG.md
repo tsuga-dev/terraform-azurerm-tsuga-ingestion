@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Upgraded the OTel collector image from `0.161.0` to `0.164.0`. One upstream behaviour change
+  comes with it: the Azure Resource Logs translator now emits `code.function.name` and
+  `code.file.path` instead of `code.function` and `code.filepath`, following the promotion of the
+  `pkg.translator.azurelogs.EmitV1LogConventions` and `pkg.translator.azurelogs.DontEmitV0LogConventions`
+  feature gates to beta ([#52096](https://github.com/open-telemetry/opentelemetry-collector-contrib/pull/52096)).
+
 ## [1.0.6] - 2026-09-16
 
 ### Changed
